@@ -69,63 +69,66 @@ for ep in range(num_epochs):
     for x_batch, y_batch in dataloader_train:
         x_batch = x_batch.to(device)
         y_batch = y_batch.to(device)
-
+        
         outputs = model(x_batch)
         loss = loss_fun(outputs, y_batch)
         model.zero_grad()
         loss.backward()
         optimizer.step()
 
-    L_train = 0
-    num_correct_train = 0
-    for x_batch, y_batch in dataloader_train:
-        x_batch = x_batch.to(device)
-        y_batch = y_batch.to(device)
+    with torch.inference_mode():
 
-        outputs = model(x_batch)
-        loss = loss_fun(outputs, y_batch)
-        L_train += loss * len(x_batch)
+        L_train = 0
+        num_correct_train = 0
+        for x_batch, y_batch in dataloader_train:
+            x_batch = x_batch.to(device)
+            y_batch = y_batch.to(device)
 
-        probabilities = torch.sigmoid(outputs)
-        y_pred = torch.round(probabilities)
-        num_correct_train += (y_pred == y_batch).sum()
+            outputs = model(x_batch)
+            loss = loss_fun(outputs, y_batch)
+            L_train += loss * len(x_batch)
+
+            probabilities = torch.sigmoid(outputs)
+            y_pred = torch.round(probabilities)
+            num_correct_train += (y_pred == y_batch).sum()
 
 
-    L_train = L_train / len(dataset_train)
-    L_train = L_train.item()
-    L_vals_train.append(L_train)
+        L_train = L_train / len(dataset_train)
+        L_train = L_train.item()
+        L_vals_train.append(L_train)
 
-    acc_train = num_correct_train / (len(dataset_train) * 26)
-    acc_train = acc_train.item()
-    acc_vals_train.append(acc_train)
-    print(f'L_train is: {L_train}')
-    print(f'acc_train is: {acc_train}')
+        acc_train = num_correct_train / (len(dataset_train) * 26)
+        acc_train = acc_train.item()
+        acc_vals_train.append(acc_train)
+        print(f'L_train is: {L_train}')
+        print(f'acc_train is: {acc_train}')
 
-    L_val = 0
-    num_correct_val = 0
-    num_zeros_val = 0
-    for x_batch, y_batch in dataloader_val:
-        x_batch = x_batch.to(device)
-        y_batch = y_batch.to(device)
+        L_val = 0
+        num_correct_val = 0
+        num_zeros_val = 0
+        for x_batch, y_batch in dataloader_val:
+            x_batch = x_batch.to(device)
+            y_batch = y_batch.to(device)
 
-        outputs = model(x_batch)
-        loss = loss_fun(outputs, y_batch)
-        L_val += loss * len(x_batch)
+            outputs = model(x_batch)
+            loss = loss_fun(outputs, y_batch)
+            L_val += loss * len(x_batch)
 
-        probabilities = torch.sigmoid(outputs)
-        y_pred = torch.round(probabilities)
-        num_correct_val += (y_pred == y_batch).sum()
+            probabilities = torch.sigmoid(outputs)
+            y_pred = torch.round(probabilities)
+            num_correct_val += (y_pred == y_batch).sum()
 
-        num_zeros_val += (y_batch == 0).sum()
+            num_zeros_val += (y_batch == 0).sum()
 
-    L_val = L_val / len(dataset_val)
-    L_val = L_val.item()
-    L_vals_val.append(L_val)
+        L_val = L_val / len(dataset_val)
+        L_val = L_val.item()
+        L_vals_val.append(L_val)
 
-    acc_val = num_correct_val / (len(dataset_val) * 26)
-    acc_val = acc_val.item()
-    acc_vals_val.append(acc_val)
-    acc_val_simple = num_zeros_val.item() / (len(dataset_val) * 26)
+        acc_val = num_correct_val / (len(dataset_val) * 26)
+        acc_val = acc_val.item()
+        acc_vals_val.append(acc_val)
+        acc_val_simple = num_zeros_val.item() / (len(dataset_val) * 26)
+
     print(f'L_val is: {L_val}')
     print(f'acc_val is: {acc_val}')
     print(f'accuracy predicting all zeros is: {acc_val_simple}')
