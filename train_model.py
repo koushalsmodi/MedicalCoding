@@ -53,7 +53,8 @@ class SimpleNN(torch.nn.Module):
         return u
     
 model = SimpleNN()
-
+device = torch.device('cuda')
+model.to(device)
 loss_fun = torch.nn.BCEWithLogitsLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=3e-4)
 
@@ -66,6 +67,8 @@ for ep in range(num_epochs):
     print(f'ep is: {ep}')
 
     for x_batch, y_batch in dataloader_train:
+        x_batch = x_batch.to(device)
+        y_batch = y_batch.to(device)
 
         outputs = model(x_batch)
         loss = loss_fun(outputs, y_batch)
@@ -76,6 +79,9 @@ for ep in range(num_epochs):
     L_train = 0
     num_correct_train = 0
     for x_batch, y_batch in dataloader_train:
+        x_batch = x_batch.to(device)
+        y_batch = y_batch.to(device)
+
         outputs = model(x_batch)
         loss = loss_fun(outputs, y_batch)
         L_train += loss * len(x_batch)
@@ -99,6 +105,9 @@ for ep in range(num_epochs):
     num_correct_val = 0
     num_zeros_val = 0
     for x_batch, y_batch in dataloader_val:
+        x_batch = x_batch.to(device)
+        y_batch = y_batch.to(device)
+
         outputs = model(x_batch)
         loss = loss_fun(outputs, y_batch)
         L_val += loss * len(x_batch)
