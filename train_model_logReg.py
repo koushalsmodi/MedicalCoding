@@ -46,28 +46,11 @@ class SimpleNN(torch.nn.Module):
 
     def __init__(self):
         super().__init__()
-        self.dense1 = torch.nn.Linear(512, 1000)
-        self.bn1 = torch.nn.BatchNorm1d(1000)
-        self.dense2 = torch.nn.Linear(1000, 500)
-        self.bn2 = torch.nn.BatchNorm1d(500)
-        self.dense3 = torch.nn.Linear(500, 26)
-
-        self.dropout = torch.nn.Dropout(p=.2)
-        self.relu = torch.nn.ReLU()
+        self.dense1 = torch.nn.Linear(512, 26)
 
     def forward(self, x):
-        x = self.dense1(x)
-        x = self.bn1(x)
-        x = self.relu(x)
-        x = self.dropout(x)
-
-        x = self.dense2(x)
-        x = self.bn2(x)
-        x = self.relu(x)
-        x = self.dropout(x)
-
-        x = self.dense3(x)
-        return x
+        u = self.dense1(x)
+        return u
     
 model = SimpleNN()
 device = torch.device('cuda')
