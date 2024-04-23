@@ -27,8 +27,8 @@ pdb.set_trace()
 #np.savez('train_and_val_subject_ids.npz', subject_ids_train=subject_ids_train,
 #                                          subject_ids_val=subject_ids_val,
 #                                          subject_ids_test=subject_ids_test)
- 33 
- 34 discharge_train = discharge.query('subject_id in @subject_ids_train')
+
+discharge_train = discharge.query('subject_id in @subject_ids_train')
  35 discharge_val = discharge.query('subject_id in @subject_ids_val')
  36 discharge_test = discharge.query('subject_id in @subject_ids_test')
  37 
