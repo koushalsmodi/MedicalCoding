@@ -8,7 +8,7 @@ print('hello world !!')
 data_dir = '/home/ksmodi/data/'
 diagnoses = pd.read_csv(data_dir + 'diagnoses_icd.csv')
  diagnoses10 = diagnoses.query('icd_version == 10')
- 13 
+
  14 fname = data_dir + 'discharge.csv'
  15 discharge_full = pd.read_csv(data_dir + 'discharge.csv')
  16 
