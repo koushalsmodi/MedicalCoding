@@ -16,7 +16,7 @@ discharge_full = pd.read_csv(data_dir + 'discharge.csv')
 relevant_hadm_ids = list(diagnoses10['hadm_id'].unique())
 discharge = discharge_full[discharge_full['hadm_id'].isin(relevant_hadm_ids)]
 discharge['text_length'] = discharge['text'].apply(len)
- 21 
+
  22 discharge_sorted = discharge.sort_values(by='text_length', ascending=False)
  23 
  24 unique_subject_ids = discharge['subject_id'].unique()
