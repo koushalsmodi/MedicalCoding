@@ -35,7 +35,7 @@ discharge_test = discharge.query('subject_id in @subject_ids_test')
 hadm_ids_train = discharge_train['hadm_id'].values
 hadm_ids_val = discharge_val['hadm_id'].values
 
- 42 np.savez('train_val_test_hadm_ids.npz', hadm_ids_train=hadm_ids_train, hadm_ids_val=hadm_ids_val,
+np.savez('train_val_test_hadm_ids.npz', hadm_ids_train=hadm_ids_train, hadm_ids_val=hadm_ids_val,
  43                                         hadm_ids_test=hadm_ids_test)
  44 
  45 
