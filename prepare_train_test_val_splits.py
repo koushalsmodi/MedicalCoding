@@ -13,7 +13,7 @@ fname = data_dir + 'discharge.csv'
 discharge_full = pd.read_csv(data_dir + 'discharge.csv')
 
 # Here we should throw out the irrelevant doctor's notes.
- 18 relevant_hadm_ids = list(diagnoses10['hadm_id'].unique())
+relevant_hadm_ids = list(diagnoses10['hadm_id'].unique())
  19 discharge = discharge_full[discharge_full['hadm_id'].isin(relevant_hadm_ids)]
  20 discharge['text_length'] = discharge['text'].apply(len)
  21 
