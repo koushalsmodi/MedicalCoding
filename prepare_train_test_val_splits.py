@@ -19,7 +19,7 @@ discharge['text_length'] = discharge['text'].apply(len)
 
 discharge_sorted = discharge.sort_values(by='text_length', ascending=False)
 unique_subject_ids = discharge['subject_id'].unique()
- 25 
+
  26 subject_ids_train, subject_ids_val = sk.model_selection.train_test_split(unique_subject_ids, train_size=.8)
  27 subject_ids_val, subject_ids_test = sk.model_selection.train_test_split(subject_ids_val, train_size=.5)
  28 
