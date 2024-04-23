@@ -22,8 +22,8 @@ unique_subject_ids = discharge['subject_id'].unique()
 
 subject_ids_train, subject_ids_val = sk.model_selection.train_test_split(unique_subject_ids, train_size=.8)
 subject_ids_val, subject_ids_test = sk.model_selection.train_test_split(subject_ids_val, train_size=.5)
- 28 
- 29 pdb.set_trace()
+
+pdb.set_trace()
  30 #np.savez('train_and_val_subject_ids.npz', subject_ids_train=subject_ids_train,
  31 #                                          subject_ids_val=subject_ids_val,
  32 #                                          subject_ids_test=subject_ids_test)
