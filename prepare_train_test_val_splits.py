@@ -9,7 +9,7 @@ data_dir = '/home/ksmodi/data/'
 diagnoses = pd.read_csv(data_dir + 'diagnoses_icd.csv')
 diagnoses10 = diagnoses.query('icd_version == 10')
 
- 14 fname = data_dir + 'discharge.csv'
+fname = data_dir + 'discharge.csv'
  15 discharge_full = pd.read_csv(data_dir + 'discharge.csv')
  16 
  17 # Here we should throw out the irrelevant doctor's notes.
