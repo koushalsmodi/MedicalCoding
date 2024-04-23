@@ -29,7 +29,7 @@ pdb.set_trace()
 #                                          subject_ids_test=subject_ids_test)
 
 discharge_train = discharge.query('subject_id in @subject_ids_train')
- 35 discharge_val = discharge.query('subject_id in @subject_ids_val')
+discharge_val = discharge.query('subject_id in @subject_ids_val')
  36 discharge_test = discharge.query('subject_id in @subject_ids_test')
  37 
  38 hadm_ids_train = discharge_train['hadm_id'].values
