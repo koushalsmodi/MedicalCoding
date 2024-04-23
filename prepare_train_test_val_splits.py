@@ -33,4 +33,4 @@ discharge_val = discharge.query('subject_id in @subject_ids_val')
 discharge_test = discharge.query('subject_id in @subject_ids_test')
 
 hadm_ids_train = discharge_train['hadm_id'].values
- 39 hadm_ids_val = discharge_val['hadm_id'].values
+hadm_ids_val = discharge_val['hadm_id'].values
