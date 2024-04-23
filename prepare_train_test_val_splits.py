@@ -25,7 +25,7 @@ subject_ids_val, subject_ids_test = sk.model_selection.train_test_split(subject_
 
 pdb.set_trace()
 #np.savez('train_and_val_subject_ids.npz', subject_ids_train=subject_ids_train,
- 31 #                                          subject_ids_val=subject_ids_val,
+#                                          subject_ids_val=subject_ids_val,
  32 #                                          subject_ids_test=subject_ids_test)
  33 
  34 discharge_train = discharge.query('subject_id in @subject_ids_train')
