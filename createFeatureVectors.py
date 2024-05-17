@@ -7,7 +7,6 @@ import timeit
 import pdb
 
 print('hello world !!')
-
 data_dir = '/home/ksmodi/data/'
 diagnoses = pd.read_csv(data_dir + 'diagnoses_icd.csv')
 diagnoses10 = diagnoses.query('icd_version == 10')
@@ -24,9 +23,26 @@ discharge_sorted = discharge.sort_values(by='text_length', ascending=False)
 
 
 df = discharge_sorted[['hadm_id', 'text']]
-pdb.set_trace()
-tokenizer = T5Tokenizer.from_pretrained('google/flan-t5-small')
-model = T5EncoderModel.from_pretrained('google/flan-t5-small')
+
+# Here we select a language model to use.
+
+model_name = 'google/flan-t5-large'
+if model_name == 'google/flan-t5-small':
+    tokenizer = T5Tokenizer.from_pretrained('google/flan-t5-small')
+    model = T5EncoderModel.from_pretrained('google/flan-t5-small')
+    embedding_vec_dim = 512
+    save_name = 'flan-t5-small'
+elif model_name == 'google/flan-t5-base':
+    tokenizer = T5Tokenizer.from_pretrained('google/flan-t5-base')
+    model = T5EncoderModel.from_pretrained('google/flan-t5-base', torch_dtype=torch.float16)
+    embedding_vec_dim = 768
+    save_name = 'flan-t5-base' # careful not to use the same save_name for different models
+elif model_name == 'google/flan-t5-large':
+    tokenizer = T5Tokenizer.from_pretrained("google/flan-t5-large")
+    model = T5EncoderModel.from_pretrained('google/flan-t5-large', torch_dtype=torch.float16)
+    embedding_vec_dim = 1024
+    save_name = 'flan-t5-large'
+else: print('model_name not recognized!!')
 
 # tokenizer = T5Tokenizer.from_pretrained('google/flan-t5-base')
 # model = T5EncoderModel.from_pretrained('google/flan-t5-base')
@@ -38,7 +54,6 @@ batch_size = 32
 batch_size = 128
 num_batches = int(np.ceil(N / batch_size))
 chunk_size = 500
-embedding_vec_dim = 512
 
 feature_vectors = torch.zeros((N, embedding_vec_dim)) 
 hadm_ids = np.zeros(N)
@@ -84,7 +99,7 @@ time_stop = timeit.default_timer()
 time_elapsed = time_stop - time_start
 
 feature_vectors = feature_vectors.numpy()
-np.savez('feature_vectors_and_hadm_ids', feature_vectors=feature_vectors, hadm_ids=hadm_ids)
+np.savez('feature_vectors_and_hadm_ids_' + save_name, feature_vectors=feature_vectors, hadm_ids=hadm_ids)
 
 
 

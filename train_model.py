@@ -8,17 +8,40 @@ import pdb
 # This program shows how to load the feature vectors and hadm_ids
 # which are saved in numpy arrays by createFeatureVectors.py.
 
-data = np.load('feature_vectors_and_hadm_ids.npz')
+# BE SURE TO CHANGE THIS LINE TO READ IN THE CORRECT FEATURE VECTORS.
+print('BE SURE TO READ IN THE CORRECT FEATURE VECTORS!')
+#data = np.load('feature_vectors_and_hadm_ids.npz')
+data = np.load('feature_vectors_and_hadm_ids_flan-t5-large.npz')
 feature_vectors = data['feature_vectors']
 hadm_ids = np.int64(data['hadm_ids'])
+d = feature_vectors.shape[1]
+
+train_val_test_splits = np.load('train_val_test_hadm_ids.npz')
+hadm_ids_train = train_val_test_splits['hadm_ids_train']
+hadm_ids_val = train_val_test_splits['hadm_ids_val']
+hadm_ids_test = train_val_test_splits['hadm_ids_test']
 
 
 filename = 'target_vectors.pkl'
 with open(filename, 'rb') as f:
     target_vectors = pickle.load(f)
 
-feature_vectors_train, feature_vectors_val, hadm_ids_train, hadm_ids_val = \
-        sk.model_selection.train_test_split(feature_vectors, hadm_ids, train_size=.8, random_state=123)
+# Let's split feature_vecs and hadm_ids into train, validation, and test sets.
+whr_train = np.where(np.isin(hadm_ids, hadm_ids_train))[0]
+whr_val = np.where(np.isin(hadm_ids, hadm_ids_val))[0]
+whr_test = np.where(np.isin(hadm_ids, hadm_ids_test))[0]
+
+hadm_ids_train = hadm_ids[whr_train]
+hadm_ids_val = hadm_ids[whr_val]
+hadm_ids_test = hadm_ids[whr_test]
+
+feature_vectors_train = feature_vectors[whr_train]
+feature_vectors_val = feature_vectors[whr_val]
+feature_vectors_test = feature_vectors[whr_test]
+
+# The below way of splitting the data was wrong because of data leakage.
+# feature_vectors_train, feature_vectors_val, hadm_ids_train, hadm_ids_val = \
+#         sk.model_selection.train_test_split(feature_vectors, hadm_ids, train_size=.8, random_state=123)
 
 class ICD10_Dataset():
     def __init__(self, fv, ids, tv):
@@ -46,7 +69,7 @@ class SimpleNN(torch.nn.Module):
 
     def __init__(self):
         super().__init__()
-        self.dense1 = torch.nn.Linear(512, 1000)
+        self.dense1 = torch.nn.Linear(d, 1000) # d is the dimension of our feature vectors.
         self.bn1 = torch.nn.BatchNorm1d(1000)
         self.dense2 = torch.nn.Linear(1000, 500)
         self.bn2 = torch.nn.BatchNorm1d(500)
@@ -68,8 +91,33 @@ class SimpleNN(torch.nn.Module):
 
         x = self.dense3(x)
         return x
-    
+
+class SimpleNN_005(torch.nn.Module):
+
+   def __init__(self):
+       super().__init__()
+       self.dense1 = torch.nn.Linear(d, 400)
+       self.dense2 = torch.nn.Linear(400, 200)
+       self.dense3 = torch.nn.Linear(200, 100)
+       self.dense4 = torch.nn.Linear(100, 50)
+       self.dense5 = torch.nn.Linear(50, 26)
+       self.relu = torch.nn.ReLU()
+       
+   def forward(self, x):
+       u1 = self.dense1(x)
+       v1 = self.relu(u1)
+       u2 = self.dense2(v1)
+       v2 = self.relu(u2)
+       u3 = self.dense3(v2)
+       v3 = self.relu(u3)
+       u4 = self.dense4(v3)
+       v4 = self.relu(u4)
+       u5 = self.dense5(v4)
+
+       return u5
+   
 model = SimpleNN()
+# model = SimpleNN_005()
 device = torch.device('cuda')
 model.to(device)
 loss_fun = torch.nn.BCEWithLogitsLoss()
@@ -205,7 +253,12 @@ F1_micro_vals_train = np.array(F1_micro_vals_train)
 F1_micro_vals_val = np.array(F1_micro_vals_val)
 
 
-np.savez('scores.npz', L_vals_train=L_vals_train, L_vals_val = L_vals_val, 
+from datetime import datetime
+current_datetime = datetime.now()
+datetime_string = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
+
+# The following line of code hasn't been tested yet!
+np.savez('scores_' + datetime_string + '.npz', L_vals_train=L_vals_train, L_vals_val = L_vals_val, 
                        acc_vals_train=acc_vals_train, acc_vals_val=acc_vals_val, 
                        precision_vals_train=precision_vals_train, precision_vals_val=precision_vals_val,
                        recall_vals_train=recall_vals_train, recall_vals_val = recall_vals_val,

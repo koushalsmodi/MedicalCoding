@@ -135,9 +135,29 @@ for ep in range(num_epochs):
     print(f'acc_val is: {acc_val}')
     print(f'accuracy predicting all zeros is: {acc_val_simple}')
 
+L_vals_train = np.array(L_vals_train)
+L_vals_val = np.array(L_vals_val)
+acc_vals_train = np.array(acc_vals_train)
+acc_vals_val = np.array(acc_vals_val)
+precision_vals_train = np.array(precision_vals_train)
+precision_vals_val = np.array(precision_vals_val)
+recall_vals_train = np.array(recall_vals_train)
+recall_vals_val = np.array(recall_vals_val)
+F1_micro_vals_train = np.array(F1_micro_vals_train)
+F1_micro_vals_val = np.array(F1_micro_vals_val)
 
 
 
+
+from datetime import datetime
+current_datetime = datetime.now()
+datetime_string = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
+
+np.savez('scores_' + datetime_string + '.npz', L_vals_train=L_vals_train, L_vals_val = L_vals_val, 
+                       acc_vals_train=acc_vals_train, acc_vals_val=acc_vals_val, 
+                       precision_vals_train=precision_vals_train, precision_vals_val=precision_vals_val,
+                       recall_vals_train=recall_vals_train, recall_vals_val = recall_vals_val,
+                       F1_micro_vals_train=F1_micro_vals_train, F1_micro_vals_val=F1_micro_vals_val)
 
 
 

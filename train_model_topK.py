@@ -13,11 +13,15 @@ feature_vectors = data['feature_vectors']
 hadm_ids = np.int64(data['hadm_ids'])
 
 
-filename = 'target_vectors_topK.pkl'
+#filename = 'target_vectors_topK.pkl'
+filename = 'target_vectors_top10.pkl'
+
 with open(filename, 'rb') as f:
     target_vectors = pickle.load(f)
 
-K = 50
+# K = 50
+keys = list(target_vectors.keys())
+K = len(target_vectors[keys[0]])
 
 feature_vectors_train, feature_vectors_val, hadm_ids_train, hadm_ids_val = \
         sk.model_selection.train_test_split(feature_vectors, hadm_ids, train_size=.8, random_state=123)
