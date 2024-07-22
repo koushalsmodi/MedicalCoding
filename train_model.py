@@ -57,16 +57,18 @@ class ICD10_Dataset():
         hadm_id = str(self.hadm_ids[i])
         y = self.target_vectors[hadm_id]
 
-        return torch.tensor(x, dtype=torch.float32), torch.tensor(y, dtype = torch.float32)
+        return torch.tensor(x, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
 
 dataset_train = ICD10_Dataset(feature_vectors_train, hadm_ids_train, target_vectors)
 dataset_val = ICD10_Dataset(feature_vectors_val, hadm_ids_val, target_vectors)
+dataset_test = ICD10_Dataset(feature_vectors_test, hadm_ids_test, target_vectors)
+
 
 dataloader_train = torch.utils.data.DataLoader(dataset_train, batch_size=64, shuffle=True)
 dataloader_val = torch.utils.data.DataLoader(dataset_val, batch_size=64, shuffle=False)
+dataloader_test = torch.utils.data.DataLoader(dataset_test,batch_size=64, shuffle=False)
 
 class SimpleNN(torch.nn.Module):
-
     def __init__(self):
         super().__init__()
         self.dense1 = torch.nn.Linear(d, 1000) # d is the dimension of our feature vectors.
@@ -239,7 +241,67 @@ for ep in range(num_epochs):
     print(f'recall_val is: {recall_val}')
     print(f'F1_micro_val is: {F1_micro_val}')
 
+L_vals_test = []
+acc_vals_test = []
+precision_vals_test = []
+recall_vals_test = []
+F1_micro_vals_test = []
 
+for ep in range(num_epochs):
+    print(f'ep is: {ep}')
+
+    for x_batch, y_batch in dataloader_test:
+        x_batch = x_batch.to(device)
+        y_batch = y_batch.to(device)
+
+        outputs = model(x_batch)
+        loss = loss_fun(outputs, y_batch)
+        model.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+    with torch.inference_mode():
+
+        L_test = 0
+        num_correct_test = 0
+        TP_test = 0
+        FP_test = 0
+        FN_test = 0
+        for x_batch, y_batch in dataloader_test:
+            x_batch = x_batch.to(device)
+            y_batch = y_batch.to(device)
+
+            outputs = model(x_batch)
+            loss = loss_fun(outputs, y_batch)
+            L_test += loss * len(x_batch)
+
+            probabilities = torch.sigmoid(outputs)
+            y_pred = torch.round(probabilities)
+            num_correct_test += (y_pred == y_batch).sum()
+
+            TP_test += torch.sum((y_pred == 1) & (y_batch == 1))
+            FP_test += torch.sum((y_pred == 1) & (y_batch == 0))
+            FN_test += torch.sum((y_pred == 0) & (y_batch == 1))
+
+        L_test = L_test / len(dataset_test)
+        L_test = L_test.item()
+        L_vals_test.append(L_test)
+
+        acc_test = num_correct_test / (len(dataset_test) * 26)
+        acc_test = acc_test.item()
+        acc_vals_test.append(acc_test)
+
+        precision_test = TP_test / (TP_test + FP_test)
+        recall_test = TP_test / (TP_test + FN_test)
+        F1_micro_test = 2 * precision_test * recall_test / (precision_test + recall_test)
+        precision_vals_test.append(precision_test.item())
+        recall_vals_test.append(recall_test.item())
+        F1_micro_vals_test.append(F1_micro_test.item())
+        print(f'L_test is: {L_test}')
+        print(f'acc_test is: {acc_test}')
+        print(f'precision_test is: {precision_test}')
+        print(f'recall_test is: {recall_test}')
+        print(f'F1_micro_test is: {F1_micro_test}')
 
 L_vals_train = np.array(L_vals_train)
 L_vals_val = np.array(L_vals_val)
@@ -252,22 +314,24 @@ recall_vals_val = np.array(recall_vals_val)
 F1_micro_vals_train = np.array(F1_micro_vals_train)
 F1_micro_vals_val = np.array(F1_micro_vals_val)
 
+L_vals_test = np.array(L_vals_test)
+acc_vals_test = np.array(acc_vals_test)
+precision_vals_test = np.array(precision_vals_test)
+recall_vals_test = np.array(recall_vals_test)
+F1_micro_vals_test = np.array(F1_micro_vals_test)
 
 from datetime import datetime
 current_datetime = datetime.now()
 datetime_string = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
 
 # The following line of code hasn't been tested yet!
-np.savez('scores_' + datetime_string + '.npz', L_vals_train=L_vals_train, L_vals_val = L_vals_val, 
-                       acc_vals_train=acc_vals_train, acc_vals_val=acc_vals_val, 
-                       precision_vals_train=precision_vals_train, precision_vals_val=precision_vals_val,
-                       recall_vals_train=recall_vals_train, recall_vals_val = recall_vals_val,
-                       F1_micro_vals_train=F1_micro_vals_train, F1_micro_vals_val=F1_micro_vals_val)
-
-
-
-
-
+np.savez('scores_' + datetime_string + '.npz', L_vals_train=L_vals_train, L_vals_val = L_vals_val,
+                        acc_vals_train=acc_vals_train, acc_vals_val=acc_vals_val,
+                        precision_vals_train=precision_vals_train, precision_vals_val=precision_vals_val,
+                        recall_vals_train=recall_vals_train,recall_vals_val=recall_vals_val,
+                        F1_micro_vals_train=F1_micro_vals_train, F1_micro_vals_val=F1_micro_vals_val,
+                        L_vals_test=L_vals_test,acc_vals_test=acc_vals_test,precision_vals_test=precision_vals_test,recall_vals_test=recall_vals_test,
+                        F1_micro_vals_test=F1_micro_vals_test)
 
 
 
