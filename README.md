@@ -8,5 +8,5 @@ https://medium.com/usf-msds/a-deep-learning-based-medical-coding-assistant-2aab9
 ## Link to slides:
 https://docs.google.com/presentation/d/1v8YgHqVu9MPvyhCz59KyvpmgN3gJ-wCa/edit?usp=sharing&ouid=103619115995793027366&rtpof=true&sd=true
 
-## Link to oral presentation:
+## Link to oral presentation at Creative Activity and Research Day:
 https://drive.google.com/file/d/1m8PNLSS7V68btiO42gV4iBMXDprOIQpp/view
